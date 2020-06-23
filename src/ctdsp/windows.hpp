@@ -15,14 +15,16 @@ class window {
   double correction_factor = 1.0;
 
  public:
+  using value_type = typename decltype(data)::value_type;
   template <class Generator>
   consteval window(Generator generator) {
     std::generate(data.begin(), data.end(), generator);
   }
-  constexpr auto begin() { return data.begin(); }
-  constexpr auto end() { return data.end(); }
-  constexpr auto cbegin() const { return data.cbegin(); }
-  constexpr auto cend() const { return data.cend(); }
+  constexpr auto begin() noexcept { return data.begin(); }
+  constexpr auto end() noexcept { return data.end(); }
+  constexpr auto cbegin() const noexcept { return data.cbegin(); }
+  constexpr auto cend() const noexcept { return data.cend(); }
+  constexpr auto size() const noexcept { return data.size(); }
 };
 
 template <size_t length, typename T = double>
