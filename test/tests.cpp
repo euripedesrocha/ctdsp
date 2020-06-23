@@ -26,21 +26,23 @@ TEST_CASE("Boxcar window", "[window]") {
 }
 
 TEST_CASE("Direct Window Creation", "[window]") {
+  using namespace ctdsp;
   // Uses a immediatly invoked lambda to return the required data
-  constexpr auto manipulated_window = []() {
-    auto n = 0;
-    auto generator = [n]() mutable { return ++n; };
-    auto my_window = window::window<32>{generator};
+  [[maybe_unused]] constexpr auto manipulated_window = []() {
+    constexpr size_t length = 32;
+    constexpr auto generator = [n = 0]() mutable { return ++n; };
+    constexpr auto my_window = window::window<length>{generator};
     return my_window;
   }();
 }
 
 TEST_CASE("Window normalization", "ctdsp") {
-  using ctdsp;
-  constexpr auto normalized =
-      ctdsp::normalize(ctdsp::window::boxcar<32>(), 5.0);
+  using namespace ctdsp;
+  constexpr auto boxcar = window::boxcar<32>();
+  constexpr auto normalized = ctdsp::normalize(boxcar, by_value{5.0});
   constexpr auto normalized_value = 1. / 5.0;
   REQUIRE(all_equal_to(normalized, normalized_value));
-  constexpr auto max_normalized = normalize(window::boxcar<32>(), by_max{});
-  constexpr auto rms_normalized = normalize(window::boxcar<32>(), by_rms{});
+  constexpr auto max_normalized = normalize(boxcar, by_max{});
+  REQUIRE(all_equal_to(max_normalized, 1.0));
+  [[maybe_unused]] constexpr auto rms_normalized = normalize(boxcar, by_rms{});
 }
