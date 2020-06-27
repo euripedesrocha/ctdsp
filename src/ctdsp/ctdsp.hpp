@@ -1,11 +1,44 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <concepts>
 #include <numeric>
+#include <type_traits>
 
 namespace ctdsp {
+
+template <typename T, size_t length>
+struct array {
+  std::array<T, length> data;
+
+  template <size_t size, typename Generator, typename... GenArgs>
+  constexpr array([[maybe_unused]] std::integral_constant<size_t, size> s,
+                  Generator generator, GenArgs... Args) {
+    auto gen = [generator, Args...]() { return generator(Args...); };
+    std::generate(data.begin(), data.end(), gen);
+  }
+};
+
+template <size_t size, typename Generator, typename... GenArgs>
+array(std::integral_constant<size_t, size> s, Generator generator,
+      GenArgs... Args) -> array<std::invoke_result_t<Generator, GenArgs...>, s>;
+
+template <size_t size, typename Generator, typename... GenArgs>
+constexpr auto make_array(
+    [[maybe_unused]] std::integral_constant<size_t, size> s,
+    Generator generator, GenArgs... Args) {
+  constexpr auto arr = array(s, generator, Args...);
+  return arr.get();
+}
+// template <size_t size, typename Generator, typename... GenArgs>
+// constexpr auto make_array(Generator generator, GenArgs... Args) {
+// std::array<std::invoke_result_t<Generator, GenArgs...>, size> data;
+// auto gen = [generator, Args...]() { return generator(Args...); };
+// std::generate(data.begin(), data.end(), gen);
+// return data;
+//}
 
 template <class Data, typename T = typename Data::value_type>
 constexpr auto norm(Data const& data) {
