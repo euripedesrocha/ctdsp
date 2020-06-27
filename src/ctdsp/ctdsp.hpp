@@ -21,6 +21,18 @@ constexpr auto normalize(auto data,
   return data;
 }
 
+constexpr auto convolve(auto const& signal, auto const& kernel, auto& result) {
+  // assert that b::value_type and a::value_type have the necessary operarions
+  auto N = signal.size();
+  auto M = kernel.size();
+  for (auto i = 0; i < N + M - 1; ++i) {
+    result[i] = 0;
+    for (auto j = 0; j < M; ++j) {
+      result[i] += signal[j] * kernel[i - j];
+    }
+  }
+}
+
 struct by_value {
   double value;
   constexpr auto operator()([[maybe_unused]] auto const& data) const noexcept {
