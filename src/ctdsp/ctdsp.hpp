@@ -5,6 +5,8 @@
 #include <concepts>
 #include <numeric>
 
+#include "array.hpp"
+
 namespace ctdsp {
 
 template <class Data, typename T = typename Data::value_type>
